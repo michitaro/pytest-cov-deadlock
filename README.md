@@ -6,7 +6,7 @@ When the option `--cov` is specified, `multiprocessing.Process.join` causes a de
 
 ```bash
 mkdir .venv
-pipenv --ptyhon=pipenv --python $HOME/miniconda/envs/py39/bin/python
+pipenv --python $HOME/miniconda/envs/py39/bin/python
 pipenv install
 ```
 
