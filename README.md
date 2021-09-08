@@ -159,3 +159,68 @@ Traceback (most recent call last):
     pid, sts = os.waitpid(self.pid, flag)
 KeyboardInterrupt
 ```
+
+
+## Docker version
+
+```bash
+docker build -t pytest-cov-deadlock .
+docker run pytest-cov-deadlock pytest # OK
+docker run pytest-cov-deadlock pytest --cov # NG
+```
+
+### without `--cov`
+
+```
+$ docker run pytest-cov-deadlock pytest
+============================= test session starts ==============================
+platform linux -- Python 3.9.7, pytest-6.2.5, py-1.10.0, pluggy-1.0.0
+rootdir: /work
+plugins: cov-2.12.1
+collected 1 item
+
+test_test.py .                                                           [100%]
+
+============================== 1 passed in 2.84s ===============================
+```
+
+### with `--cov`
+```
+$ docker run pytest-cov-deadlock pytest --cov
+============================= test session starts ==============================
+platform linux -- Python 3.9.7, pytest-6.2.5, py-1.10.0, pluggy-1.0.0
+rootdir: /work
+plugins: cov-2.12.1
+collected 1 item
+
+test_test.py F                                                           [100%]
+
+=================================== FAILURES ===================================
+__________________________________ test_main ___________________________________
+
+    def test_main():
+        for i in range(400):
+            errors.clear()
+            run_thread()
+            if len(errors) > 0:
+>               raise RuntimeError(f'join timeout occured in trial {i}')
+E               RuntimeError: join timeout occured in trial 37
+
+test_test.py:33: RuntimeError
+
+----------- coverage: platform linux, python 3.9.7-final-0 -----------
+Name           Stmts   Miss  Cover
+----------------------------------
+test_test.py      23      0   100%
+----------------------------------
+TOTAL             23      0   100%
+
+=========================== short test summary info ============================
+FAILED test_test.py::test_main - RuntimeError: join timeout occured in trial 37
+============================== 1 failed in 2.69s ===============================
+^CError in atexit._run_exitfuncs:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/multiprocessing/popen_fork.py", line 27, in poll
+    pid, sts = os.waitpid(self.pid, flag)
+KeyboardInterrupt
+```
