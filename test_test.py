@@ -19,7 +19,6 @@ def bg_thread():
 
 
 def run_thread():
-    errors.clear()
     th = threading.Thread(target=bg_thread)
     th.start()
     sqlite3.connect(':memory:').close()
@@ -27,7 +26,8 @@ def run_thread():
 
 
 def test_main():
-    for i in range(200):
+    for i in range(400):
+        errors.clear()
         run_thread()
         if len(errors) > 0:
             raise RuntimeError(f'join timeout occured in trial {i}')
